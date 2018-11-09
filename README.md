@@ -1,6 +1,6 @@
 # Website fictício: Galeria Arte & Artes
 
-Website fictício de uma galeria de arte (Arte & Artes), desenvolvido com o propósito de ser um recurso pedagógico, para demonstração da tecnologia ASP.NET Web Pages, bem como para servir de base para a criação de projetos por parte dos alunos.
+Website fictício de uma galeria de arte (Arte & Artes), desenvolvido com o objetivo de ser um recurso pedagógico para demonstração da tecnologia ASP.NET Web Pages, bem como para servir de base para a criação de projetos por parte dos alunos.
 
 Este website foi desenvolvido no âmbito da lecionação da disciplina de Sistemas e Programação Web, do curso profissional de Técnico de Multimédia, do ensino secundário.
 

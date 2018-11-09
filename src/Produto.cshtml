@@ -1,0 +1,78 @@
+﻿@{
+    // O ID do produto visualizado na página
+    int ID = 0;
+
+    // Obter o ID do produto, a partir da querystring
+    if (!IsPost)
+    {
+        if ((!Request.QueryString["p"].IsEmpty()) && (Request.QueryString["p"].IsInt()))
+        {
+            ID = Request.QueryString["p"].AsInt();
+        }
+    }
+
+    // Abrir a base de dados
+    var db = Database.Open("arte_e_artes");
+  
+    // Especificar a consulta para seleção de todos os produtos  
+    string query = "SELECT * FROM Produtos WHERE ID = @0";
+
+    // Executar a consulta
+    var Produto = db.Query(query, ID);
+}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="utf-8" />
+	<title>Detalhes da Obra - Arte &amp; Artes</title>
+    @RenderPage("/Shared/_Metatags.cshtml")
+</head>
+<body>
+    @RenderPage("/Shared/_Header.cshtml")
+
+    <main class="detalhe-produto">
+		<div class="container">
+			<div class="breadcrumbs">
+				<a href="Default.cshtml">Início</a> &rsaquo; <a href="#">Pintura</a>
+			</div>
+
+            @{
+                if (!Produto.Any())
+                {
+                    <text>
+                    <p class="erro-produto">Produto não encontrado</p>
+                    </text>
+                }
+                else
+                {
+                    foreach (var P in Produto)
+                    {
+                        <text>
+                        <h1>
+                            Detalhes da obra &lsquo;<strong>@P.Designacao</strong>&rsquo;
+                        </h1>
+
+                        <p class="preco">@P.Preco.ToString("C")</p>
+
+                        <p class="autor">Autor: <strong>@P.Autor</strong></p>
+
+                        <div class="imagem-produto">
+                            <img src="assets/@P.Imagem" />
+                        </div>
+
+                        <h2>Detalhes da Obra</h2>
+
+                        Título: <strong>@P.Designacao</strong><br />
+                        Autor: <strong>@P.Autor</strong><br />
+                        Data: <strong>@P.Data</strong><br />
+                        Dimensões: <strong>@P.Dimensoes</strong>
+                        </text>
+                    }
+                }
+            }
+		</div>
+	</main>
+
+    @RenderPage("/Shared/_Footer.cshtml")
+</body>
+</html>

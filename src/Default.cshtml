@@ -1,0 +1,89 @@
+﻿@{
+    // Abrir a base de dados
+    var db = Database.Open("arte_e_artes");
+
+    // Especificar a consulta para seleção de todos os produtos  
+    string query = "SELECT * FROM Produtos";
+
+    if (!IsPost)
+    {
+        if (!Request.QueryString["categoria"].IsEmpty())
+        {
+            if (Request.QueryString["categoria"] == "pintura")
+            {
+                query = "SELECT * FROM Produtos WHERE Categoria_ID = 1";
+            }
+            else if (Request.QueryString["categoria"] == "fotografia")
+            {
+                query = "SELECT * FROM Produtos WHERE Categoria_ID = 2";
+            }            
+        }
+    }
+
+    // Executar a consulta
+    var Produtos = db.Query(query);
+}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="utf-8" />
+	<title>Arte &amp; Artes</title>
+    @RenderPage("/Shared/_Metatags.cshtml")
+    <link rel="stylesheet" type="text/css" href="slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="slick/slick-theme.css"/>
+
+    <script src="js/jquery.min.js"></script>
+    <script async src="slick/slick.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.HeroImage').slick({
+                fade: true,
+                dots: false,
+                autoplay: true,
+                arrows: false
+               });
+        });
+    </script>
+</head>
+<body>
+    @RenderPage("/Shared/_Header.cshtml")
+
+	<main>
+        <div class="HeroImage">
+            <div><img src="assets/h1.jpg" /></div>
+            <div><img src="assets/h2.jpg" /></div>
+            <div><img src="assets/h3.jpg" /></div>
+            <div><img src="assets/h4.jpg" /></div>
+            <div><img src="assets/h5.jpg" /></div>
+        </div>
+
+		<div class="container">
+			<h1>
+				Destaques
+			</h1>
+
+			<div class="destaques">
+                @foreach (var P in Produtos)
+                {
+                    <text>
+				    <div>
+					    <a href="Produto.cshtml?p=@P.ID"><img src="assets/@P.Imagem_thumbnail" alt="@P.Designacao" /></a>
+					    <div class="info">
+						    <div class="designacao_preco">
+							    <div class="designacao"><a href="produto.cshtml?p=@P.ID">@P.Designacao</a></div>
+							    <div class="data">@P.Data</div>
+						    </div>
+						    <div class="autor">@P.Autor</div>
+						    <div class="preco">@P.Preco.ToString("C")</div>
+					    </div>
+				    </div>
+                    </text>
+                }
+			</div>
+		</div>
+	</main>
+
+    @RenderPage("/Shared/_Footer.cshtml")
+</body>
+</html>

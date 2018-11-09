@@ -1,0 +1,85 @@
+﻿@{
+    string MensagemErro = "";
+
+    // Verificar que são recebidos dados através do método POST
+    if (IsPost)
+    {
+        // Verificar que os campos obrigatórios estão preenchidos
+        if ((!Request["Username"].IsEmpty()) && (!Request["Password"].IsEmpty()))
+        {
+            // Abrir a base de dados
+            var db = Database.Open("arte_e_artes");
+
+            // Especificar a consulta para seleção do utilizador  
+            string query = "SELECT Password FROM Utilizadores WHERE Username = @0";
+
+            // Executar a consulta
+            var Utilizador = db.Query(query, Request["Username"]);
+
+            // Verificar se a consulta devolveu algum registo
+            if (Utilizador.Any())
+            {
+                // Codifica a password introduzida no formulário
+                string hash = Crypto.Hash(Request["password"]);
+
+                foreach (var U in Utilizador)
+                {
+                    // Comparar a password codificada do formulário com a password codificada na base de dados
+                    if (hash == U.Password)
+                    {
+                        // O utilizador efetuou o login corretamente: armazenar o username em sessão
+                        Session["Username"] = Request["Username"];
+                        
+                        // Redirecionar para a página de administração 
+                        Response.Redirect("~/admin/Default.cshtml", true);
+                    }
+                    else
+                    {
+                        MensagemErro = "<p><strong class=\"erro\">Nome de utilizador ou password incorretos</strong></p>";
+                    }
+                }
+            }
+            else
+            {
+                MensagemErro = "<p><strong class=\"erro\">Nome de utilizador ou password incorretos</strong></p>";
+            }
+        }
+        else
+        {
+            MensagemErro = "<p><strong class=\"erro\">Erro: não preencheu todos os campos obrigatórios</strong></p>";
+        }
+    }
+}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="utf-8" />
+	<title>Login - Arte &amp; Artes</title>
+    @RenderPage("/Shared/_Metatags.cshtml")
+</head>
+<body class="PaginaLogin">
+    @RenderPage("/Shared/_Header.cshtml", "login")
+
+    <main>
+        <form action="Login.cshtml" method="post" class="login">
+            <h1>Login</h1>
+
+            <div>
+                <input type="text" name="Username" id="Username" size="40" maxlength="30" placeholder="Nome de utilizador" required autofocus>
+            </div>
+
+            <div>
+                <input type="password" name="Password" id="Password" size="40" maxlength="30" placeholder="Password" required>
+            </div>
+
+            <div>
+                <button type="submit">Submeter</button>
+            </div>
+
+            @Html.Raw(MensagemErro)
+
+            <p>&xlarr; <a href="Default.cshtml">Início</a></p>
+        </form>
+    </main>
+</body>
+</html>				

@@ -1,0 +1,214 @@
+﻿@{
+	// Verificar se o utilizador efetuou login
+	if (Session["Username"] == null)
+	{
+		Response.Redirect("~/Default.cshtml", true);
+	}
+
+    int ID = 0;
+    int Operacao = 0;
+    string Username = "";
+    string MensagemErro = "";
+
+	if (!IsPost)
+	{
+        // Verificar que o parâmetro 'operacao' é válido
+        if (!Request.QueryString["operacao"].IsEmpty())
+		{
+            switch (Request.QueryString["operacao"])
+            {
+                case "inserir":
+                    Operacao = 1;
+
+                    // Armazenar a operação numa variável de sessão
+                    Session["Operacao"] = Operacao;
+
+                    break;
+
+                case "editar":
+                    Operacao = 2;
+
+                    // Verificar que o parâmetro 'id' é válido
+                    if ((!Request.QueryString["id"].IsEmpty()) && (Request.QueryString["id"].IsInt()))
+                    {
+                        // Armazenar o ID do produto
+                        ID = Request.QueryString["id"].AsInt();
+
+                        // Armazenar a operação numa variável de sessão
+                        Session["Operacao"] = Operacao;
+
+                        // Armazenar o ID numa variável de sessão
+                        Session["ID"] = ID;
+
+                        // Obter os dados do utilizador
+                        
+                        // Abrir a base de dados
+                        var db = Database.Open("arte_e_artes");
+
+                        // Especificar a consulta para seleção do utilizador
+                        string query = "SELECT Username FROM Utilizadores WHERE ID = @0";
+
+                        // Executar a consulta
+                        var Utilizador = db.Query(query, ID);
+
+                        // Erro: redirecionar para a página inicial
+                        if (!Utilizador.Any())
+                        {
+                            Response.Redirect("Default.cshtml?operacao=editarutilizador_erro", true);
+                        }
+
+                        // Obter o username do utilizador
+                        foreach (var U in Utilizador)
+                        {
+                            Username = U.Username;
+                        }
+                    }
+
+                    // Erro: redirecionar para a página inicial
+                    if ((ID == 0) || (Username == String.Empty))
+                    {
+                        Response.Redirect("Default.cshtml?operacao=editarutilizador_erro", true);
+                    }
+
+                    break;
+
+                default:
+                    // Operação inválida: redirecionar para a página inicial
+                    Response.Redirect("Default.cshtml", true);
+                    break;
+            }
+        }
+     
+        // Operação inválida: redirecionar para a página inicial
+        if (Operacao == 0)
+        {
+            Response.Redirect("Default.cshtml", true);
+        }
+    }
+    else
+    {
+        // Começar por colocar na variável Username o username recebido através de POST
+        Username = Request["Username"];
+
+        // Recuperar a operação a partir da variável de sessão
+        if (Session["Operacao"] != null)
+        {
+            Operacao = (int) Session["Operacao"];
+        }
+
+        // Recuperar o ID a partir da variável de sessão
+        if (Session["ID"] != null)
+        {
+            ID = (int) Session["ID"];
+        }
+
+        // Verificar que os campos obrigatórios estão preenchidos
+        if ((!Request["Username"].IsEmpty()) && (!Request["Password"].IsEmpty()))
+        {
+            if ((Request["Username"].Length <= 30) && (Request["Password"].Length <= 30))
+            {
+                string hash = Crypto.Hash(Request["Password"]);
+
+                // Abrir a base de dados
+                var db = Database.Open("arte_e_artes");
+
+                // Especificar a consulta consoante a operação a efetuar
+                string query = "";
+
+                if (Operacao == 1)
+                {
+                    query = "INSERT INTO Utilizadores (Username, Password) VALUES (@0, @1)";
+                    
+                    if (db.Execute(query, Request["Username"], hash) == 1)
+                    {
+                        // Remover as variáveis de sessão
+                        Session["Operacao"] = null;
+                        Session["ID"] = null;
+
+                        Response.Redirect("Default.cshtml?operacao=criarutilizador_ok", true);
+                    }
+                    else
+                    {
+                        MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar criar o novo utilizador</strong></div>";
+                    }
+                }
+                else if (Operacao == 2)
+                {
+                    query = "UPDATE Utilizadores SET Username = @0, Password = @1 WHERE ID = @2";
+
+                    if (db.Execute(query, Request["Username"], hash, ID) == 1)
+                    {
+                        // Remover as variáveis de sessão
+                        Session["Operacao"] = null;
+                        Session["ID"] = null;
+
+                        Response.Redirect("Default.cshtml?operacao=editarutilizador_ok", true);
+                    }
+                    else
+                    {
+                        MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar editar o utilizador</strong></div>";
+                    }
+                }
+            }
+        }
+        else
+        {
+            MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Erro</strong><br />Não preencheu todos os campos obrigatórios</div>";
+        }
+    }
+}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="utf-8">
+    <title>Admin - Arte &amp; Artes</title>
+    @RenderPage("Shared/_Metatags.cshtml")
+</head>
+<body>
+	@RenderPage("Shared/_Header.cshtml")
+
+    <div class="container-fluid" style="padding: 0 1rem 2rem 1rem">
+        <div class="row">
+            @RenderPage("Shared/_Sidebar.cshtml")
+
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        @if (Operacao == 1)
+                        {
+                            <text>Criar Novo Utilizador</text>
+                        }
+                        else if (Operacao == 2)
+                        {
+                            <text>Editar Utilizador</text>
+                        }
+                    </h1>
+                </div>
+
+                <div style=" width: 70%">
+                    <form class="form-produto" action="Utilizador.cshtml" method="post" style="margin-bottom: 1rem">
+                        <div class="form-group">
+                            <label for="Designacao">Username</label>
+                            <input type="text" name="Username" id="Username" value="@(Username)" maxlength="30" placeholder="Username" class="form-control" autofocus required />
+                            <small class="form-text text-info">Preenchimento obrigatório</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Password">Password</label>
+                            <input type="password" name="Password" id="Password" maxlength="30" placeholder="Password do utilizador" class="form-control" required />
+                            <small class="form-text text-info">Preenchimento obrigatório</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Submeter</button>
+                        <a href="Default.cshtml" onclick="return window.confirm('Confirma que deseja cancelar esta operação?');" class="btn btn-danger">Cancelar</a>
+                    </form>
+
+                    @Html.Raw(MensagemErro)
+                </div>
+            </main>
+        </div>
+    </div>
+
+	@RenderPage("Shared/_Footer.cshtml")
+</body>
+</html>

@@ -1,0 +1,260 @@
+﻿@using Arte_e_Artes
+@{
+	// Verificar se o utilizador efetuou login
+	if (Session["Username"] == null)
+	{
+		Response.Redirect("~/Default.cshtml", true);
+	}
+
+    int ID = 0;
+    int Operacao = 0;
+    string MensagemErro = "";
+    Produto DadosProduto = new Produto(0, "", "", "", "", 0, "", "", "", 0);
+    string Erro_Designacao = "";
+    string Erro_Preco = "";
+
+	if (!IsPost)
+	{
+        // Verificar que o parâmetro 'operacao' é válido
+        if (!Request.QueryString["operacao"].IsEmpty())
+		{
+            switch (Request.QueryString["operacao"])
+            {
+                case "inserir":
+                    Operacao = 1;
+
+                    // Armazenar a operação numa variável de sessão
+                    Session["Operacao"] = Operacao;
+
+                    break;
+
+                case "editar":
+                    Operacao = 2;
+
+                    // Verificar que o parâmetro 'id' é válido
+                    if ((!Request.QueryString["id"].IsEmpty()) && (Request.QueryString["id"].IsInt()))
+                    {
+                        // Armazenar o ID do produto
+                        ID = Request.QueryString["id"].AsInt();
+
+                        // Armazenar a operação numa variável de sessão
+                        Session["Operacao"] = Operacao;
+
+                        // Armazenar o ID numa variável de sessão
+                        Session["ID"] = ID;
+
+                        // Obter os dados do produto
+                        // Abrir a base de dados
+                        var db = Database.Open("arte_e_artes");
+
+                        // Especificar a consulta para seleção dos dados do produto
+                        string query = "SELECT * FROM Produtos WHERE ID = @0";
+
+                        // Executar a consulta
+                        var Produto = db.Query(query, ID);
+
+                        // Erro: redirecionar para a página inicial
+                        if (!Produto.Any())
+                        {
+                            Response.Redirect("Default.cshtml?operacao=editarproduto_erro", true);
+                        }
+
+                        // Armazenar os dados obtidos no objeto DadosProduto
+                        foreach (var P in Produto)
+                        {
+                            DadosProduto = new Produto(P.ID, P.Designacao, P.Autor, P.Descricao, P.Data, P.Preco, P.Imagem_thumbnail, P.Imagem, P.Dimensoes, P.Categoria_ID);
+                        }
+                    }
+
+                    // Erro: redirecionar para a página inicial
+                    if (ID == 0)
+                    {
+                        Response.Redirect("Default.cshtml?operacao=editarproduto_erro", true);
+                    }
+
+                    break;
+
+                default:
+                    // Operação inválida: redirecionar para a página inicial
+                    Response.Redirect("Default.cshtml", true);
+                    break;
+            }
+        }
+     
+        if (Operacao == 0)
+        {
+            Response.Redirect("Default.cshtml", true);
+        }
+    }
+    else if (IsPost)
+    {
+        bool Validacao = true;
+
+        // Recuperar a operação a partir da variável de sessão
+        if (Session["Operacao"] != null)
+        {
+            Operacao = (int) Session["Operacao"];
+        }
+
+        // Recuperar o ID a partir da variável de sessão
+        if (Session["ID"] != null)
+        {
+            ID = (int) Session["ID"];
+        }
+
+        // Verificar que o campo obrigatório Designacao está preenchido
+        if (Request["Designacao"].IsEmpty())
+        {
+            Erro_Designacao = "<div class=\"text-danger\" role=\"alert\"><strong>Erro: preenchimento obrigatório</strong></div>";
+            Validacao = false;
+        }
+
+        // Verificar que o campo numérico Preco apenas contém números
+        if ((!Request["Preco"].IsEmpty()) && (!Request["Preco"].IsDecimal()))
+        {
+            Erro_Preco = "<div class=\"text-danger\" role=\"alert\"><strong>Erro: apenas pode conter números</strong></div>";
+            Validacao = false;
+        }
+
+        // Armazenar os dados obtidos no objeto DadosProduto
+        DadosProduto = new Produto(ID, Request["Designacao"], Request["Autor"], Request["Descricao"], Request["Data"], Request["Preco"].AsDecimal(), Request["Imagem_thumbnail"], Request["Imagem"], Request["Dimensoes"], Request["Categoria_ID"].AsInt());
+
+        // Se não ocorreram erros de validação, inserir/atualizar o produto
+        if (Validacao)
+        {
+            // Abrir a base de dados
+            var db = Database.Open("arte_e_artes");
+
+            // Especificar a consulta consoante a operação a efetuar
+            string query = "";
+
+            if (Operacao == 1)
+            {
+                query = "INSERT INTO Produtos (Designacao, Autor, Descricao, Data, Preco, Imagem_thumbnail, Imagem, Dimensoes, Categoria_ID) VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8)";
+                
+                if (db.Execute(query, DadosProduto.Designacao, DadosProduto.Autor, DadosProduto.Descricao, DadosProduto.Data, DadosProduto.Preco, DadosProduto.Imagem_thumbnail, DadosProduto.Imagem, DadosProduto.Dimensoes, DadosProduto.Categoria_ID) == 1)
+                {
+                    // Remover as variáveis de sessão
+                    Session["Operacao"] = null;
+                    Session["ID"] = null;
+
+                    Response.Redirect("Default.cshtml?operacao=criarproduto_ok", true);
+                }
+                else
+                {
+                    MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar criar o novo produto</strong></div>";
+                }
+            }
+            else if (Operacao == 2)
+            {
+                query = "UPDATE Produtos SET Designacao = @0, Autor = @1, Descricao = @2, Data = @3, Preco = @4, Imagem_thumbnail = @5, Imagem = @6, Dimensoes = @7, Categoria_ID = @8 WHERE ID = @9";
+
+                if (db.Execute(query, DadosProduto.Designacao, DadosProduto.Autor, DadosProduto.Descricao, DadosProduto.Data, DadosProduto.Preco, DadosProduto.Imagem_thumbnail, DadosProduto.Imagem, DadosProduto.Dimensoes, DadosProduto.Categoria_ID, ID) == 1)
+                {
+                    // Remover as variáveis de sessão
+                    Session["Operacao"] = null;
+                    Session["ID"] = null;
+
+                    Response.Redirect("Default.cshtml?operacao=editarproduto_ok", true);
+                }
+                else
+                {
+                    MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar editar o produto</strong></div>";
+                }
+            }
+        }
+    }
+}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="utf-8">
+    <title>Admin - Arte &amp; Artes</title>
+    @RenderPage("Shared/_Metatags.cshtml")
+</head>
+<body>
+	@RenderPage("Shared/_Header.cshtml")
+
+    <div class="container-fluid" style="padding: 0 1rem 2rem 1rem">
+        <div class="row">
+            @RenderPage("Shared/_Sidebar.cshtml")
+            
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        @if (Operacao == 1)
+                        {
+                            <text>Criar Novo Produto</text>
+                        }
+                        else if (Operacao == 2)
+                        {
+                            <text>Editar Produto</text>
+                        }
+                    </h1>
+                </div>
+
+                <p>Preço: @Request["Preco"]</p>
+
+                <div style=" width: 70%">
+                    <form class="form-produto" action="Produto.cshtml" method="post" style="margin-bottom: 1rem">
+                        <div class="form-group">
+                            <label for="Designacao">Designação</label>
+                            <input type="text" name="Designacao" id="Designacao" value="@DadosProduto.Designacao" maxlength="254" placeholder="Designação do produto" class="form-control" required />
+                            <small class="form-text text-info">Preenchimento obrigatório</small>
+                            @Html.Raw(@Erro_Designacao)
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Autor">Autor</label>
+                            <input type="text" name="Autor" id="Autor" value="@DadosProduto.Autor" maxlength="254" placeholder="Autor do produto" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Data">Data</label>
+                            <input type="text" name="Data" id="Data" value="@DadosProduto.Data" maxlength="20" placeholder="Data do produto" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Preco">Preço</label>
+                            <input type="text" name="Preco" id="Preco" value="@DadosProduto.Preco" maxlength="10" placeholder="Preço do produto" class="form-control">
+                            <small class="form-text text-info">Utilize a vírgula ( , ) para especificar cêntimos</small>
+                            @Html.Raw(@Erro_Preco)
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Imagem_thumbnail">Imagem de dimensões reduzidas</label>
+                            <input type="text" name="Imagem_thumbnail" id="Imagem_thumbnail" value="@DadosProduto.Imagem_thumbnail" maxlength="254" placeholder="Nome do ficheiro" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Imagem">Imagem normal</label>
+                            <input type="text" name="Imagem" id="Imagem" value="@DadosProduto.Imagem" maxlength="254" placeholder="Nome do ficheiro" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Dimensoes">Dimensões</label>
+                            <input type="text" name="Dimensoes" id="Dimensoes" value="@DadosProduto.Dimensoes" maxlength="20" placeholder="Dimensões do produto" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="Categoria_ID">Tipo</label>
+                            <select name="Categoria_ID" id="Categoria_ID" class="form-control">
+                                <option value=""></option>
+                                <option value="1" @{ if (DadosProduto.Categoria_ID == 1) { <text>selected</text> } }>Pintura</option>
+                                <option value="2" @{ if (DadosProduto.Categoria_ID == 2) { <text>selected</text> } }>Fotografia</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Submeter</button>
+                        <a href="Default.cshtml" onclick="return window.confirm('Confirma que deseja cancelar esta operação?');" class="btn btn-danger">Cancelar</a>
+                    </form>
+
+                    @Html.Raw(MensagemErro)
+                </div>
+            </main>
+        </div>
+    </div>
+
+	@RenderPage("Shared/_Footer.cshtml")
+</body>
+</html>

@@ -1,0 +1,7 @@
+@{ 
+    if (Session["Username"] != null)
+    {
+        Session["Username"] = null;
+    }
+    Response.Redirect("~/Default.cshtml", true);
+}

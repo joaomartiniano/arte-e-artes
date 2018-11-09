@@ -1,0 +1,12 @@
+h2 { margin-bottom: 1rem; }
+section { margin: 2rem 0; }
+
+.nome-site { font-size: 1rem; font-weight: normal; }
+.nome-site .e { font-family: 'Playfair Display', serif; font-size: 1.2em; color: #b92121; }
+
+.VistaProdutos-Lista { font-size: 0.8rem; padding: 0.5rem 0; border-bottom: 1px solid #ececec; 
+                       display: flex; flex-direction: row; justify-content: flex-start; align-items: center;
+}
+.VistaProdutos-Lista img { width: 90px; }
+.VistaProdutos-Lista div { flex-basis: auto; margin-right: 1rem; }
+.VistaProdutos-Lista .botoes { flex-grow: 1; text-align: right; }

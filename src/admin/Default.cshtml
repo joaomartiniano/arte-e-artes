@@ -1,0 +1,198 @@
+﻿@{
+	// Verificar se o utilizador efetuou login
+	if (Session["Username"] == null)
+	{
+		Response.Redirect("~/Default.cshtml", true);
+	}
+
+    // Abrir a base de dados
+    var db = Database.Open("arte_e_artes");
+
+    // Especificar a consulta para seleção de todos os produtos
+    string query_produtos = "SELECT * FROM Produtos";
+
+    // Especificar a consulta para seleção de todos os utilizadores
+    string query_utilizadores = "SELECT * FROM Utilizadores";
+
+    // Executar as consultas
+    var Produtos = db.Query(query_produtos);
+	var Utilizadores = db.Query(query_utilizadores);
+}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="utf-8">
+	<title>Admin - Arte &amp; Artes</title>
+	@RenderPage("Shared/_Metatags.cshtml")
+</head>
+<body>
+	@RenderPage("Shared/_Header.cshtml")
+
+	<div class="container-fluid">
+		<div class="row">
+			@RenderPage("Shared/_Sidebar.cshtml")
+
+			<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+				<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+					<h1 class="h2">Administração da Loja</h1>
+				</div>
+
+				<section>
+					@{
+						if (!IsPost)
+						{
+							// Mostrar mensagens de feedback
+							if (!Request.QueryString["operacao"].IsEmpty())
+							{
+								switch (Request.QueryString["operacao"])
+								{
+									case "criarutilizador_ok":
+										<text>
+										<div class="alert alert-success" role="alert"><strong>O novo utilizador foi criado com sucesso</strong></div>
+										</text>
+										break;
+
+									case "editarutilizador_ok":
+										<text>
+										<div class="alert alert-success" role="alert"><strong>O utilizador foi editado com sucesso</strong></div>
+										</text>
+										break;
+
+									case "editarutilizador_erro":
+										<text>
+										<div class="alert alert-danger" role="alert"><strong>Ocorreu um erro ao tentar editar o utilizador: utilizador desconhecido</strong></div>
+										</text>
+										break;
+
+									case "eliminarutilizador_ok":
+										<text>
+										<div class="alert alert-success" role="alert"><strong>O utilizador foi eliminado com sucesso</strong></div>
+										</text>
+										break;
+
+									case "eliminarutilizador_erro":
+										<text>
+										<div class="alert alert-danger" role="alert"><strong>Ocorreu um erro ao tentar eliminar o utilizador</strong></div>
+										</text>
+										break;
+
+									case "criarproduto_ok":
+										<text>
+										<div class="alert alert-success" role="alert"><strong>O novo produto foi criado com sucesso</strong></div>
+										</text>
+										break;
+
+									case "editarproduto_ok":
+										<text>
+										<div class="alert alert-success" role="alert"><strong>O produto foi editado com sucesso</strong></div>
+										</text>
+										break;
+
+									case "editarproduto_erro":
+										<text>
+										<div class="alert alert-danger" role="alert"><strong>Ocorreu um erro ao tentar editar o produto: produto desconhecido</strong></div>
+										</text>
+										break;
+
+									case "eliminarproduto_ok":
+										<text>
+										<div class="alert alert-success" role="alert"><strong>O produto foi eliminado com sucesso</strong></div>
+										</text>
+										break;
+
+									case "eliminarproduto_erro":
+										<text>
+										<div class="alert alert-danger" role="alert"><strong>Ocorreu um erro ao tentar eliminar o produto</strong></div>
+										</text>
+										break;
+								}
+							}
+						}
+					}
+				</section>
+
+				<section>
+					<h2>Produtos</h2>
+
+					# Produtos: @Produtos.Count()
+
+					@{ 
+						if (!Produtos.Any())
+						{
+							<p class="h2 text-muted text-center">SEM PRODUTOS PARA MOSTRAR</p>
+						}
+						else
+						{
+							foreach (var P in Produtos)
+							{
+								<text>
+								<div class="VistaProdutos-Lista">
+									<div>
+										<img src="~/assets/@P.Imagem_thumbnail" alt="@P.Designacao" />
+									</div>
+									<div>
+										ID: <strong>@P.ID</strong><br />
+										Designação: <strong>@P.Designacao</strong><br />
+										Data: <strong>@P.Data</strong><br />
+										Autor: <strong>@P.Autor</strong><br />
+										Preço: <strong>@P.Preco.ToString("C")</strong>
+									</div>
+									<div class="botoes">
+										<a href="Produto.cshtml?operacao=editar&id=@P.ID" class="btn btn-primary btn-sm">Editar</a>&nbsp;
+										<a href="eliminar?operacao=produto&id=@P.ID" onclick="return window.confirm('Confirma que deseja eliminar este produto?');" class="btn btn-secondary btn-sm">Eliminar</a>								
+									</div>
+								</div>
+								</text>
+							}
+						}
+					}
+				</section>
+
+				<section>
+					<h2>Utilizadores</h2>
+
+					# Utilizadores: @Utilizadores.Count()
+
+					@{ 
+						if (!Utilizadores.Any())
+						{
+							<p class="h2 text-muted text-center">SEM UTILIZADORES PARA MOSTRAR</p>
+						}
+						else
+						{
+							<table class="table">
+								<thead class="thead-light">
+									<tr>
+										<th>ID</th>
+										<th>Username</th>
+										<th>Password</th>
+										<th>&nbsp;</th>
+									</tr>
+								</thead>
+								<tbody>
+									@foreach (var U in Utilizadores)
+									{
+										<text>
+										<tr>
+											<td>@U.ID</td>
+											<td>@U.Username</td>
+											<td>@U.Password</td>
+											<td>
+												<a href="Utilizador.cshtml?operacao=editar&id=@U.ID" class="btn btn-primary btn-sm">Editar</a>&nbsp;
+												<a href="eliminar?operacao=utilizador&id=@U.ID" onclick="return window.confirm('Confirma que deseja eliminar este utilizador?');" class="btn btn-secondary btn-sm">Eliminar</a>
+											</td>
+										</tr>
+										</text>
+									}
+								</tbody>
+							</table>
+						}
+					}
+				</section>
+			</main>
+		</div>
+	</div>
+
+	@RenderPage("Shared/_Footer.cshtml")
+</body>
+</html>

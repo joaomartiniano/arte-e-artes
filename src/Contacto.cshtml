@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="utf-8" />
+	<title>Formulário de Contacto - Arte &amp; Artes</title>
+    @RenderPage("/Shared/_Metatags.cshtml")
+</head>
+<body>
+    @RenderPage("/Shared/_Header.cshtml")
+
+    <main>
+        <div class="container">
+            <h1>Formulário de Contacto</h1>
+
+            <form action="Contacto.cshtml" method="post">
+                <div>
+			        <label for="nome">Nome:</label> <small class="obrigatorio">*</small><br />
+			        <input type="text" name="nome" id="nome" value="@Request["nome"]" size="60" maxlength="100" placeholder="Indique o seu nome" />
+                </div>
+
+                <div>
+			        <label for="email">Email:</label> <small class="obrigatorio">*</small><br />
+			        <input type="email" name="email" id="email" value="@Request["email"]" size="60" maxlength="100" placeholder="Indique o seu email" />
+                </div>
+
+                <div>
+                    <label for="telefone">Contacto telefónico:</label> <small class="obrigatorio">*</small><br />
+                    <input type="text" name="telefone" id="telefone" value="@Request["telefone"]" size="30" maxlength="9" placeholder="O seu telefone ou telemóvel" />
+                </div>
+
+		        <div>
+			        <label for="produto">Sobre que peça pretende informações?</label><br />
+			        <select name="produto" id="produto">
+				        <option value="1">Landschap met beek (Camille Jacob Pissarro)</option>
+				        <option value="2">Landscape with Farmhouse and Haystack (Rembrandt van Rijn)</option>
+				        <option value="3">Washington Bridge, New York (Herman Anne Marie Cato Dibbits)</option>
+				        <option value="4">Hilly Landscape near Wageningen (Abraham Johannes Couwenberg)</option>
+				        <option value="5">Migrant mother (Dorothea Lange)</option>
+				        <option value="6">The Milkmaid (Johannes Vermeer)</option>
+			        </select>
+		        </div>
+
+		        <div>
+			        <label for="informacao">Qual a informação pretendida?</label> <small class="obrigatorio">*</small><br />
+			        <textarea name="informacao" id="informacao" rows="4" cols="60" placeholder="Indique a informação pretendida (tente ser o mais específico possível)">@Request["informacao"]</textarea>
+		        </div>
+
+		        <div>
+			        Pretendo ser contactado:&nbsp;&nbsp;
+			        <label>
+				        <input type="radio" name="forma_contacto" value="email" @{ if ((!Request["forma_contacto"].IsEmpty()) && (Request["forma_contacto"] == "email")) { <text>checked</text> } } /> Por email
+			        </label>
+			        &nbsp;&nbsp;
+			        <label>
+				        <input type="radio" name="forma_contacto" value="telefone" @{ if ((!Request["forma_contacto"].IsEmpty()) && (Request["forma_contacto"] == "telefone")) { <text>checked</text> } } /> Por telefone
+			        </label>
+		        </div>
+
+                <div>
+                    <label>
+                        <input type="checkbox" name="termos" value="sim" @{ if (!Request["termos"].IsEmpty()) { <text>checked</text> } } />&nbsp;
+                        Tomei conhecimento dos termos e condições <small class="obrigatorio">*</small>
+                    </label>                    
+                </div>
+
+                <p class="obrigatorio">* Campo obrigatório</p>            
+
+                <div>
+                    <button type="submit">Submeter</button>
+                </div>
+            </form>
+
+            @{
+                // Verificar que são recebidos dados através do método POST
+                if (IsPost)
+                {
+                    // Verificar que os campos obrigatórios estão preenchidos
+                    if ((!Request["nome"].IsEmpty()) && (!Request["email"].IsEmpty()) && (!Request["telefone"].IsEmpty()) && (!Request["informacao"].IsEmpty()) && (!Request["termos"].IsEmpty()))
+                    {
+                        // Verificar que o contacto telefónico contém números inteiros
+                        if (Request["telefone"].IsInt())
+                        {
+                            <text>
+                            <h2 class="sucesso">Obrigado! Brevemente entraremos em contacto consigo</h2>
+                            </text>
+                        }
+                        else
+                        {
+                            <text>
+                            <p><strong class="erro">Erro: insira apenas números no campo Contacto telefónico</strong></p>
+                            </text>
+                        }
+                    }
+                    else
+                    {
+                        <text>
+                        <p><strong class="erro">Erro: não preencheu todos os campos obrigatórios</strong></p>
+                        </text>
+                    }
+                }
+            }
+        </div>
+    </main>
+
+    @RenderPage("/Shared/_Footer.cshtml")
+</body>
+</html>

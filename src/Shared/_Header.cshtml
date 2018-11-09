@@ -1,0 +1,29 @@
+﻿<header>
+	@{
+		if (!(PageData.Any()) || (PageData[0] != "login"))
+		{
+			<text>
+			<div class="botao-login">
+				<a href="Login.cshtml">Login</a>
+			</div>
+			</text>
+		}
+	 }
+	<div class="nome-site">
+		Arte <span class="e">&amp;</span> Artes
+	</div>
+	@{
+		if (!PageData.Any())
+		{
+			<text>
+			<nav>
+				<ul>
+					<li><a href="Default.cshtml">Início</a></li>
+					<li><a href="Default.cshtml?categoria=pintura">Pintura</a></li>
+					<li><a href="Default.cshtml?categoria=fotografia">Fotografia</a></li>
+				</ul>
+			</nav>
+			</text>
+		}
+	}	
+</header>

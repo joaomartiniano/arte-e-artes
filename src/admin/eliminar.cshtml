@@ -1,0 +1,40 @@
+@{
+	// Verificar se o utilizador efetuou login
+	if (Session["Username"] == null)
+	{
+		Response.Redirect("~/Default.cshtml", true);
+	}
+
+    if (!IsPost)
+	{
+        // Verificar que os parâmetros são válidos
+        if ((!Request.QueryString["operacao"].IsEmpty()) && (!Request.QueryString["id"].IsEmpty()) && (Request.QueryString["id"].IsInt()))
+		{
+            // Abrir a base de dados
+            var db = Database.Open("arte_e_artes");
+
+            switch (Request.QueryString["operacao"])
+            {
+                case "produto":
+                    string query = "DELETE FROM Produtos WHERE ID = @0";
+
+                    if (db.Execute(query, Request.QueryString["ID"]) == 1)
+                    {
+                        Response.Redirect("Default.cshtml?operacao=eliminarproduto_ok", true);
+                    }
+                    break;
+
+                case "utilizador":
+                    query = "DELETE FROM Utilizadores WHERE ID = @0";
+
+                    if (db.Execute(query, Request.QueryString["ID"]) == 1)
+                    {
+                        Response.Redirect("Default.cshtml?operacao=eliminarutilizador_ok", true);
+                    }
+                    break;
+            }
+        }
+    }
+
+    Response.Redirect("Default.cshtml", true);
+}

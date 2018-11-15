@@ -196,7 +196,7 @@
                 <p>Preço: @Request["Preco"]</p>
 
                 <div style=" width: 70%">
-                    <form class="form-produto" action="Produto.cshtml" method="post" style="margin-bottom: 1rem">
+                    <form class="form-produto" action="~/admin/Produto.cshtml" method="post" style="margin-bottom: 1rem">
                         <div class="form-group">
                             <label for="Designacao">Designação</label>
                             <input type="text" name="Designacao" id="Designacao" value="@DadosProduto.Designacao" maxlength="254" placeholder="Designação do produto" class="form-control" required />
@@ -246,7 +246,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-success">Submeter</button>
-                        <a href="Default.cshtml" onclick="return window.confirm('Confirma que deseja cancelar esta operação?');" class="btn btn-danger">Cancelar</a>
+                        <a href="~/admin/Default.cshtml" onclick="return window.confirm('Confirma que deseja cancelar esta operação?');" class="btn btn-danger">Cancelar</a>
                     </form>
 
                     @Html.Raw(MensagemErro)

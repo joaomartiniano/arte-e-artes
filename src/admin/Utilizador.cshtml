@@ -186,7 +186,7 @@
                 </div>
 
                 <div style=" width: 70%">
-                    <form class="form-produto" action="Utilizador.cshtml" method="post" style="margin-bottom: 1rem">
+                    <form class="form-produto" action="~/admin/Utilizador.cshtml" method="post" style="margin-bottom: 1rem">
                         <div class="form-group">
                             <label for="Designacao">Username</label>
                             <input type="text" name="Username" id="Username" value="@(Username)" maxlength="30" placeholder="Username" class="form-control" autofocus required />
@@ -200,7 +200,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-success">Submeter</button>
-                        <a href="Default.cshtml" onclick="return window.confirm('Confirma que deseja cancelar esta operação?');" class="btn btn-danger">Cancelar</a>
+                        <a href="~/admin/Default.cshtml" onclick="return window.confirm('Confirma que deseja cancelar esta operação?');" class="btn btn-danger">Cancelar</a>
                     </form>
 
                     @Html.Raw(MensagemErro)

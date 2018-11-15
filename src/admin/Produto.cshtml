@@ -103,21 +103,21 @@
         }
 
         // Verificar que o campo obrigatório Designacao está preenchido
-        if (Request["Designacao"].IsEmpty())
+        if (Request.Form["Designacao"].IsEmpty())
         {
             Erro_Designacao = "<div class=\"text-danger\" role=\"alert\"><strong>Erro: preenchimento obrigatório</strong></div>";
             Validacao = false;
         }
 
         // Verificar que o campo numérico Preco apenas contém números
-        if ((!Request["Preco"].IsEmpty()) && (!Request["Preco"].IsDecimal()))
+        if ((!Request.Form["Preco"].IsEmpty()) && (!Request.Form["Preco"].IsDecimal()))
         {
             Erro_Preco = "<div class=\"text-danger\" role=\"alert\"><strong>Erro: apenas pode conter números</strong></div>";
             Validacao = false;
         }
 
         // Armazenar os dados obtidos no objeto DadosProduto
-        DadosProduto = new Produto(ID, Request["Designacao"], Request["Autor"], Request["Descricao"], Request["Data"], Request["Preco"].AsDecimal(), Request["Imagem_thumbnail"], Request["Imagem"], Request["Dimensoes"], Request["Categoria_ID"].AsInt());
+        DadosProduto = new Produto(ID, Request.Form["Designacao"], Request.Form["Autor"], Request.Form["Descricao"], Request.Form["Data"], Request.Form["Preco"].AsDecimal(), Request.Form["Imagem_thumbnail"], Request.Form["Imagem"], Request.Form["Dimensoes"], Request.Form["Categoria_ID"].AsInt());
 
         // Se não ocorreram erros de validação, inserir/atualizar o produto
         if (Validacao)
@@ -193,7 +193,7 @@
                     </h1>
                 </div>
 
-                <p>Preço: @Request["Preco"]</p>
+                <p>Preço: @Request.Form["Preco"]</p>
 
                 <div style=" width: 70%">
                     <form class="form-produto" action="~/admin/Produto.cshtml" method="post" style="margin-bottom: 1rem">

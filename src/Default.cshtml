@@ -4,11 +4,13 @@
 
     // Especificar a consulta para seleção de todos os produtos  
     string query = "SELECT * FROM Produtos";
-
+    
+    // Verificar se o utilizador escolheu uma categoria
     if (!IsPost)
     {
         if (!Request.QueryString["categoria"].IsEmpty())
         {
+            // Construir a consulta à base de dados, de acordo com a categoria selecionada
             if (Request.QueryString["categoria"] == "pintura")
             {
                 query = "SELECT * FROM Produtos WHERE Categoria_ID = 1";
@@ -28,7 +30,7 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Arte &amp; Artes</title>
-    @RenderPage("/Shared/_Metatags.cshtml")
+    @RenderPage("~/Shared/_Metatags.cshtml")
     <link rel="stylesheet" type="text/css" href="slick/slick.css"/>
     <link rel="stylesheet" type="text/css" href="slick/slick-theme.css"/>
 
@@ -47,7 +49,7 @@
     </script>
 </head>
 <body>
-    @RenderPage("/Shared/_Header.cshtml")
+    @RenderPage("~/Shared/_Header.cshtml")
 
 	<main>
         <div class="HeroImage">
@@ -68,10 +70,10 @@
                 {
                     <text>
 				    <div>
-					    <a href="Produto.cshtml?p=@P.ID"><img src="assets/@P.Imagem_thumbnail" alt="@P.Designacao" /></a>
+					    <a href="~/Produto.cshtml?p=@P.ID"><img src="~/assets/@P.Imagem_thumbnail" alt="@P.Designacao" /></a>
 					    <div class="info">
 						    <div class="designacao_preco">
-							    <div class="designacao"><a href="produto.cshtml?p=@P.ID">@P.Designacao</a></div>
+							    <div class="designacao"><a href="~/Produto.cshtml?p=@P.ID">@P.Designacao</a></div>
 							    <div class="data">@P.Data</div>
 						    </div>
 						    <div class="autor">@P.Autor</div>
@@ -84,6 +86,6 @@
 		</div>
 	</main>
 
-    @RenderPage("/Shared/_Footer.cshtml")
+    @RenderPage("~/Shared/_Footer.cshtml")
 </body>
 </html>

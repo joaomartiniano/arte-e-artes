@@ -88,7 +88,7 @@
     else
     {
         // Começar por colocar na variável Username o username recebido através de POST
-        Username = Request["Username"];
+        Username = Request.Form["Username"];
 
         // Recuperar a operação a partir da variável de sessão
         if (Session["Operacao"] != null)
@@ -103,11 +103,11 @@
         }
 
         // Verificar que os campos obrigatórios estão preenchidos
-        if ((!Request["Username"].IsEmpty()) && (!Request["Password"].IsEmpty()))
+        if ((!Request.Form["Username"].IsEmpty()) && (!Request.Form["Password"].IsEmpty()))
         {
-            if ((Request["Username"].Length <= 30) && (Request["Password"].Length <= 30))
+            if ((Request.Form["Username"].Length <= 30) && (Request.Form["Password"].Length <= 30))
             {
-                string hash = Crypto.Hash(Request["Password"]);
+                string hash = Crypto.Hash(Request.Form["Password"]);
 
                 // Abrir a base de dados
                 var db = Database.Open("arte_e_artes");
@@ -119,7 +119,7 @@
                 {
                     query = "INSERT INTO Utilizadores (Username, Password) VALUES (@0, @1)";
                     
-                    if (db.Execute(query, Request["Username"], hash) == 1)
+                    if (db.Execute(query, Request.Form["Username"], hash) == 1)
                     {
                         // Remover as variáveis de sessão
                         Session["Operacao"] = null;
@@ -136,7 +136,7 @@
                 {
                     query = "UPDATE Utilizadores SET Username = @0, Password = @1 WHERE ID = @2";
 
-                    if (db.Execute(query, Request["Username"], hash, ID) == 1)
+                    if (db.Execute(query, Request.Form["Username"], hash, ID) == 1)
                     {
                         // Remover as variáveis de sessão
                         Session["Operacao"] = null;

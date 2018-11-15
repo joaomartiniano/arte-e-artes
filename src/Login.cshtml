@@ -5,7 +5,7 @@
     if (IsPost)
     {
         // Verificar que os campos obrigatórios estão preenchidos
-        if ((!Request["Username"].IsEmpty()) && (!Request["Password"].IsEmpty()))
+        if ((!Request.Form["Username"].IsEmpty()) && (!Request.Form["Password"].IsEmpty()))
         {
             // Abrir a base de dados
             var db = Database.Open("arte_e_artes");
@@ -14,13 +14,13 @@
             string query = "SELECT Password FROM Utilizadores WHERE Username = @0";
 
             // Executar a consulta
-            var Utilizador = db.Query(query, Request["Username"]);
+            var Utilizador = db.Query(query, Request.Form["Username"]);
 
             // Verificar se a consulta devolveu algum registo
             if (Utilizador.Any())
             {
                 // Codifica a password introduzida no formulário
-                string hash = Crypto.Hash(Request["password"]);
+                string hash = Crypto.Hash(Request.Form["password"]);
 
                 foreach (var U in Utilizador)
                 {
@@ -28,7 +28,7 @@
                     if (hash == U.Password)
                     {
                         // O utilizador efetuou o login corretamente: armazenar o username em sessão
-                        Session["Username"] = Request["Username"];
+                        Session["Username"] = Request.Form["Username"];
                         
                         // Redirecionar para a página de administração 
                         Response.Redirect("~/admin/Default.cshtml", true);

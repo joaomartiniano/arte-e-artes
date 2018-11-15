@@ -15,17 +15,17 @@
             <form action="~/Contacto.cshtml" method="post">
                 <div>
 			        <label for="nome">Nome:</label> <small class="obrigatorio">*</small><br />
-			        <input type="text" name="nome" id="nome" value="@Request["nome"]" size="60" maxlength="100" placeholder="Indique o seu nome" />
+			        <input type="text" name="nome" id="nome" value="@Request.Form["nome"]" size="60" maxlength="100" placeholder="Indique o seu nome" />
                 </div>
 
                 <div>
 			        <label for="email">Email:</label> <small class="obrigatorio">*</small><br />
-			        <input type="email" name="email" id="email" value="@Request["email"]" size="60" maxlength="100" placeholder="Indique o seu email" />
+			        <input type="email" name="email" id="email" value="@Request.Form["email"]" size="60" maxlength="100" placeholder="Indique o seu email" />
                 </div>
 
                 <div>
                     <label for="telefone">Contacto telefónico:</label> <small class="obrigatorio">*</small><br />
-                    <input type="text" name="telefone" id="telefone" value="@Request["telefone"]" size="30" maxlength="9" placeholder="O seu telefone ou telemóvel" />
+                    <input type="text" name="telefone" id="telefone" value="@Request.Form["telefone"]" size="30" maxlength="9" placeholder="O seu telefone ou telemóvel" />
                 </div>
 
 		        <div>
@@ -42,23 +42,23 @@
 
 		        <div>
 			        <label for="informacao">Qual a informação pretendida?</label> <small class="obrigatorio">*</small><br />
-			        <textarea name="informacao" id="informacao" rows="4" cols="60" placeholder="Indique a informação pretendida (tente ser o mais específico possível)">@Request["informacao"]</textarea>
+			        <textarea name="informacao" id="informacao" rows="4" cols="60" placeholder="Indique a informação pretendida (tente ser o mais específico possível)">@Request.Form["informacao"]</textarea>
 		        </div>
 
 		        <div>
 			        Pretendo ser contactado:&nbsp;&nbsp;
 			        <label>
-				        <input type="radio" name="forma_contacto" value="email" @{ if ((!Request["forma_contacto"].IsEmpty()) && (Request["forma_contacto"] == "email")) { <text>checked</text> } } /> Por email
+				        <input type="radio" name="forma_contacto" value="email" @{ if ((!Request.Form["forma_contacto"].IsEmpty()) && (Request.Form["forma_contacto"] == "email")) { <text>checked</text> } } /> Por email
 			        </label>
 			        &nbsp;&nbsp;
 			        <label>
-				        <input type="radio" name="forma_contacto" value="telefone" @{ if ((!Request["forma_contacto"].IsEmpty()) && (Request["forma_contacto"] == "telefone")) { <text>checked</text> } } /> Por telefone
+				        <input type="radio" name="forma_contacto" value="telefone" @{ if ((!Request.Form["forma_contacto"].IsEmpty()) && (Request.Form["forma_contacto"] == "telefone")) { <text>checked</text> } } /> Por telefone
 			        </label>
 		        </div>
 
                 <div>
                     <label>
-                        <input type="checkbox" name="termos" value="sim" @{ if (!Request["termos"].IsEmpty()) { <text>checked</text> } } />&nbsp;
+                        <input type="checkbox" name="termos" value="sim" @{ if (!Request.Form["termos"].IsEmpty()) { <text>checked</text> } } />&nbsp;
                         Tomei conhecimento dos termos e condições <small class="obrigatorio">*</small>
                     </label>                    
                 </div>
@@ -75,10 +75,10 @@
                 if (IsPost)
                 {
                     // Verificar que os campos obrigatórios estão preenchidos
-                    if ((!Request["nome"].IsEmpty()) && (!Request["email"].IsEmpty()) && (!Request["telefone"].IsEmpty()) && (!Request["informacao"].IsEmpty()) && (!Request["termos"].IsEmpty()))
+                    if ((!Request.Form["nome"].IsEmpty()) && (!Request.Form["email"].IsEmpty()) && (!Request.Form["telefone"].IsEmpty()) && (!Request.Form["informacao"].IsEmpty()) && (!Request.Form["termos"].IsEmpty()))
                     {
                         // Verificar que o contacto telefónico contém números inteiros
-                        if (Request["telefone"].IsInt())
+                        if (Request.Form["telefone"].IsInt())
                         {
                             <text>
                             <h2 class="sucesso">Obrigado! Brevemente entraremos em contacto consigo</h2>

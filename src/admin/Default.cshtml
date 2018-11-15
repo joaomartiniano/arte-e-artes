@@ -23,14 +23,14 @@
 <head>
 	<meta charset="utf-8">
 	<title>Admin - Arte &amp; Artes</title>
-	@RenderPage("Shared/_Metatags.cshtml")
+	@RenderPage("~/admin/Shared/_Metatags.cshtml")
 </head>
 <body>
-	@RenderPage("Shared/_Header.cshtml")
+	@RenderPage("~/admin/Shared/_Header.cshtml")
 
 	<div class="container-fluid">
 		<div class="row">
-			@RenderPage("Shared/_Sidebar.cshtml")
+			@RenderPage("~/admin/Shared/_Sidebar.cshtml")
 
 			<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
 				<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -138,8 +138,8 @@
 										Preço: <strong>@P.Preco.ToString("C")</strong>
 									</div>
 									<div class="botoes">
-										<a href="Produto.cshtml?operacao=editar&id=@P.ID" class="btn btn-primary btn-sm">Editar</a>&nbsp;
-										<a href="eliminar?operacao=produto&id=@P.ID" onclick="return window.confirm('Confirma que deseja eliminar este produto?');" class="btn btn-secondary btn-sm">Eliminar</a>								
+										<a href="~/admin/Produto.cshtml?operacao=editar&id=@P.ID" class="btn btn-primary btn-sm">Editar</a>&nbsp;
+										<a href="~/admin/eliminar?operacao=produto&id=@P.ID" onclick="return window.confirm('Confirma que deseja eliminar este produto?');" class="btn btn-secondary btn-sm">Eliminar</a>								
 									</div>
 								</div>
 								</text>
@@ -178,8 +178,8 @@
 											<td>@U.Username</td>
 											<td>@U.Password</td>
 											<td>
-												<a href="Utilizador.cshtml?operacao=editar&id=@U.ID" class="btn btn-primary btn-sm">Editar</a>&nbsp;
-												<a href="eliminar?operacao=utilizador&id=@U.ID" onclick="return window.confirm('Confirma que deseja eliminar este utilizador?');" class="btn btn-secondary btn-sm">Eliminar</a>
+												<a href="~/admin/Utilizador.cshtml?operacao=editar&id=@U.ID" class="btn btn-primary btn-sm">Editar</a>&nbsp;
+												<a href="~/admin/eliminar?operacao=utilizador&id=@U.ID" onclick="return window.confirm('Confirma que deseja eliminar este utilizador?');" class="btn btn-secondary btn-sm">Eliminar</a>
 											</td>
 										</tr>
 										</text>
@@ -193,6 +193,6 @@
 		</div>
 	</div>
 
-	@RenderPage("Shared/_Footer.cshtml")
+	@RenderPage("~/admin/Shared/_Footer.cshtml")
 </body>
 </html>

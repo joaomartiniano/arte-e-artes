@@ -54,7 +54,7 @@
                         // Erro: redirecionar para a página inicial
                         if (!Utilizador.Any())
                         {
-                            Response.Redirect("Default.cshtml?operacao=editarutilizador_erro", true);
+                            Response.Redirect("~/admin/Default.cshtml?operacao=editarutilizador_erro", true);
                         }
 
                         // Obter o username do utilizador
@@ -67,14 +67,14 @@
                     // Erro: redirecionar para a página inicial
                     if ((ID == 0) || (Username == String.Empty))
                     {
-                        Response.Redirect("Default.cshtml?operacao=editarutilizador_erro", true);
+                        Response.Redirect("~/admin/Default.cshtml?operacao=editarutilizador_erro", true);
                     }
 
                     break;
 
                 default:
                     // Operação inválida: redirecionar para a página inicial
-                    Response.Redirect("Default.cshtml", true);
+                    Response.Redirect("~/admin/Default.cshtml", true);
                     break;
             }
         }
@@ -82,7 +82,7 @@
         // Operação inválida: redirecionar para a página inicial
         if (Operacao == 0)
         {
-            Response.Redirect("Default.cshtml", true);
+            Response.Redirect("~/admin/Default.cshtml", true);
         }
     }
     else
@@ -125,7 +125,7 @@
                         Session["Operacao"] = null;
                         Session["ID"] = null;
 
-                        Response.Redirect("Default.cshtml?operacao=criarutilizador_ok", true);
+                        Response.Redirect("~/admin/Default.cshtml?operacao=criarutilizador_ok", true);
                     }
                     else
                     {
@@ -142,7 +142,7 @@
                         Session["Operacao"] = null;
                         Session["ID"] = null;
 
-                        Response.Redirect("Default.cshtml?operacao=editarutilizador_ok", true);
+                        Response.Redirect("~/admin/Default.cshtml?operacao=editarutilizador_ok", true);
                     }
                     else
                     {
@@ -162,14 +162,14 @@
 <head>
     <meta charset="utf-8">
     <title>Admin - Arte &amp; Artes</title>
-    @RenderPage("Shared/_Metatags.cshtml")
+    @RenderPage("~/admin/Shared/_Metatags.cshtml")
 </head>
 <body>
-	@RenderPage("Shared/_Header.cshtml")
+	@RenderPage("~/admin/Shared/_Header.cshtml")
 
     <div class="container-fluid" style="padding: 0 1rem 2rem 1rem">
         <div class="row">
-            @RenderPage("Shared/_Sidebar.cshtml")
+            @RenderPage("~/admin/Shared/_Sidebar.cshtml")
 
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -209,6 +209,6 @@
         </div>
     </div>
 
-	@RenderPage("Shared/_Footer.cshtml")
+	@RenderPage("~/admin/Shared/_Footer.cshtml")
 </body>
 </html>

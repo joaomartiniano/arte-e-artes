@@ -20,7 +20,7 @@
 
                     if (db.Execute(query, Request.QueryString["ID"]) == 1)
                     {
-                        Response.Redirect("Default.cshtml?operacao=eliminarproduto_ok", true);
+                        Response.Redirect("~/admin/Default.cshtml?operacao=eliminarproduto_ok", true);
                     }
                     break;
 
@@ -29,12 +29,12 @@
 
                     if (db.Execute(query, Request.QueryString["ID"]) == 1)
                     {
-                        Response.Redirect("Default.cshtml?operacao=eliminarutilizador_ok", true);
+                        Response.Redirect("~/admin/Default.cshtml?operacao=eliminarutilizador_ok", true);
                     }
                     break;
             }
         }
     }
 
-    Response.Redirect("Default.cshtml", true);
+    Response.Redirect("~/admin/Default.cshtml", true);
 }

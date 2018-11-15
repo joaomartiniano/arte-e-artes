@@ -3,16 +3,16 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Formulário de Contacto - Arte &amp; Artes</title>
-    @RenderPage("/Shared/_Metatags.cshtml")
+    @RenderPage("~/Shared/_Metatags.cshtml")
 </head>
 <body>
-    @RenderPage("/Shared/_Header.cshtml")
+    @RenderPage("~/Shared/_Header.cshtml")
 
     <main>
         <div class="container">
             <h1>Formulário de Contacto</h1>
 
-            <form action="Contacto.cshtml" method="post">
+            <form action="~/Contacto.cshtml" method="post">
                 <div>
 			        <label for="nome">Nome:</label> <small class="obrigatorio">*</small><br />
 			        <input type="text" name="nome" id="nome" value="@Request["nome"]" size="60" maxlength="100" placeholder="Indique o seu nome" />
@@ -102,6 +102,6 @@
         </div>
     </main>
 
-    @RenderPage("/Shared/_Footer.cshtml")
+    @RenderPage("~/Shared/_Footer.cshtml")
 </body>
 </html>

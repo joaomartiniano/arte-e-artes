@@ -14,29 +14,26 @@
             string query = "SELECT Password FROM Utilizadores WHERE Username = @0";
 
             // Executar a consulta
-            var Utilizador = db.Query(query, Request.Form["Username"]);
-
-            // Verificar se a consulta devolveu algum registo
-            if (Utilizador.Any())
+            var Password = db.QueryValue(query, Request.Form["Username"]);
+            
+            // Verificar se a consulta devolveu um valor
+            if (!DBNull.Value.Equals(Password))
             {
                 // Codifica a password introduzida no formulário
                 string hash = Crypto.Hash(Request.Form["password"]);
 
-                foreach (var U in Utilizador)
+                // Comparar a password codificada do formulário com a password codificada na base de dados
+                if (hash == Password)
                 {
-                    // Comparar a password codificada do formulário com a password codificada na base de dados
-                    if (hash == U.Password)
-                    {
-                        // O utilizador efetuou o login corretamente: armazenar o username em sessão
-                        Session["Username"] = Request.Form["Username"];
-                        
-                        // Redirecionar para a página de administração 
-                        Response.Redirect("~/admin/Default.cshtml", true);
-                    }
-                    else
-                    {
-                        MensagemErro = "<p><strong class=\"erro\">Nome de utilizador ou password incorretos</strong></p>";
-                    }
+                    // O utilizador efetuou o login corretamente: armazenar o username em sessão
+                    Session["Username"] = Request.Form["Username"];
+                    
+                    // Redirecionar para a página de administração 
+                    Response.Redirect("~/admin/Default.cshtml", true);
+                }
+                else
+                {
+                    MensagemErro = "<p><strong class=\"erro\">Nome de utilizador ou password incorretos</strong></p>";
                 }
             }
             else

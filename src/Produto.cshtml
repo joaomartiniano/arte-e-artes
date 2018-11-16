@@ -18,7 +18,7 @@
     string query = "SELECT * FROM Produtos WHERE ID = @0";
 
     // Executar a consulta
-    var Produto = db.Query(query, ID);
+    var Produto = db.QuerySingle(query, ID);
 }
 <!DOCTYPE html>
 <html lang="pt">
@@ -37,7 +37,8 @@
 			</div>
 
             @{
-                if (!Produto.Any())
+                // Verificar se não foram retornados dados
+                if (DBNull.Value.Equals(Produto))
                 {
                     <text>
                     <p class="erro-produto">Produto não encontrado</p>
@@ -45,29 +46,26 @@
                 }
                 else
                 {
-                    foreach (var P in Produto)
-                    {
-                        <text>
-                        <h1>
-                            Detalhes da obra &lsquo;<strong>@P.Designacao</strong>&rsquo;
-                        </h1>
+                    <text>
+                    <h1>
+                        Detalhes da obra &lsquo;<strong>@Produto.Designacao</strong>&rsquo;
+                    </h1>
 
-                        <p class="preco">@P.Preco.ToString("C")</p>
+                    <p class="preco">@Produto.Preco.ToString("C")</p>
 
-                        <p class="autor">Autor: <strong>@P.Autor</strong></p>
+                    <p class="autor">Autor: <strong>@Produto.Autor</strong></p>
 
-                        <div class="imagem-produto">
-                            <img src="~/assets/@P.Imagem" />
-                        </div>
+                    <div class="imagem-produto">
+                        <img src="~/assets/@Produto.Imagem" />
+                    </div>
 
-                        <h2>Detalhes da Obra</h2>
+                    <h2>Detalhes da Obra</h2>
 
-                        Título: <strong>@P.Designacao</strong><br />
-                        Autor: <strong>@P.Autor</strong><br />
-                        Data: <strong>@P.Data</strong><br />
-                        Dimensões: <strong>@P.Dimensoes</strong>
-                        </text>
-                    }
+                    Título: <strong>@Produto.Designacao</strong><br />
+                    Autor: <strong>@Produto.Autor</strong><br />
+                    Data: <strong>@Produto.Data</strong><br />
+                    Dimensões: <strong>@Produto.Dimensoes</strong>
+                    </text>
                 }
             }
 		</div>

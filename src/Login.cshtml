@@ -10,7 +10,7 @@
             // Abrir a base de dados
             var db = Database.Open("arte_e_artes");
 
-            // Especificar a consulta para seleção do utilizador  
+            // Especificar a consulta para obter dados do utilizador  
             string query = "SELECT Password FROM Utilizadores WHERE Username = @0";
 
             // Executar a consulta
@@ -22,7 +22,7 @@
                 // Codifica a password introduzida no formulário
                 string hash = Crypto.Hash(Request.Form["password"]);
 
-                // Comparar a password codificada do formulário com a password codificada na base de dados
+                // Comparar a password codificada do formulário com a password codificada armazenada na base de dados
                 if (hash == Password)
                 {
                     // O utilizador efetuou o login corretamente: armazenar o username em sessão

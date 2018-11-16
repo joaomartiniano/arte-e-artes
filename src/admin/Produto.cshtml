@@ -51,19 +51,16 @@
                         string query = "SELECT * FROM Produtos WHERE ID = @0";
 
                         // Executar a consulta
-                        var Produto = db.Query(query, ID);
+                        var Produto = db.QuerySingle(query, ID);
 
                         // Erro: redirecionar para a página inicial
-                        if (!Produto.Any())
+                        if (DBNull.Value.Equals(Produto))
                         {
                             Response.Redirect("~/admin/Default.cshtml?operacao=editarproduto_erro", true);
                         }
 
                         // Armazenar os dados obtidos no objeto DadosProduto
-                        foreach (var P in Produto)
-                        {
-                            DadosProduto = new Produto(P.ID, P.Designacao, P.Autor, P.Descricao, P.Data, P.Preco, P.Imagem_thumbnail, P.Imagem, P.Dimensoes, P.Categoria_ID);
-                        }
+                        DadosProduto = new Produto(Produto.ID, Produto.Designacao, Produto.Autor, Produto.Descricao, Produto.Data, Produto.Preco, Produto.Imagem_thumbnail, Produto.Imagem, Produto.Dimensoes, Produto.Categoria_ID);
                     }
 
                     // Erro: redirecionar para a página inicial
@@ -192,8 +189,6 @@
                         }
                     </h1>
                 </div>
-
-                <p>Preço: @Request.Form["Preco"]</p>
 
                 <div style=" width: 70%">
                     <form class="form-produto" action="~/admin/Produto.cshtml" method="post" style="margin-bottom: 1rem">

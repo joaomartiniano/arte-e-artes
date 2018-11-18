@@ -2,11 +2,13 @@
     // O ID do produto visualizado na página
     int ID = 0;
 
-    // Obter o ID do produto, a partir da querystring
+    // Verificar que estão a ser recebidos dados através do método GET
     if (!IsPost)
     {
+        // Validar o ID do produto, recebido a partir da querystring
         if ((!Request.QueryString["p"].IsEmpty()) && (Request.QueryString["p"].IsInt()))
         {
+            // Obter o ID do produto a partir da querystring
             ID = Request.QueryString["p"].AsInt();
         }
     }

@@ -5,6 +5,7 @@
 		Response.Redirect("~/Default.cshtml", true);
 	}
 
+    // Verificar que estão a ser recebidos dados através do método GET
     if (!IsPost)
 	{
         // Verificar que os parâmetros são válidos
@@ -13,11 +14,14 @@
             // Abrir a base de dados
             var db = Database.Open("arte_e_artes");
 
+            // Determinar a operação pretendida: eliminar um produto ou eliminar um utilizador
             switch (Request.QueryString["operacao"])
             {
                 case "produto":
+                    // Criar a query para eliminar um produto
                     string query = "DELETE FROM Produtos WHERE ID = @0";
 
+                    // Executar a query e verificar se foi afetado um registo
                     if (db.Execute(query, Request.QueryString["ID"]) == 1)
                     {
                         Response.Redirect("~/admin/Default.cshtml?operacao=eliminarproduto_ok", true);
@@ -25,8 +29,10 @@
                     break;
 
                 case "utilizador":
+                    // Criar a query para eliminar um utilizador
                     query = "DELETE FROM Utilizadores WHERE ID = @0";
 
+                    // Executar a query e verificar se foi afetado um registo
                     if (db.Execute(query, Request.QueryString["ID"]) == 1)
                     {
                         Response.Redirect("~/admin/Default.cshtml?operacao=eliminarutilizador_ok", true);

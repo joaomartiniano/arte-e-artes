@@ -52,10 +52,10 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Login - Arte &amp; Artes</title>
-    @RenderPage("/Shared/_Metatags.cshtml")
+    @RenderPage("~/Shared/_Metatags.cshtml")
 </head>
 <body class="PaginaLogin">
-    @RenderPage("/Shared/_Header.cshtml", "login")
+    @RenderPage("~/Shared/_Header.cshtml", "login")
 
     <main>
         <form action="~/Login.cshtml" method="post" class="login">
@@ -75,7 +75,7 @@
 
             @Html.Raw(MensagemErro)
 
-            <p>&xlarr; <a href="Default.cshtml">Início</a></p>
+            <p>&xlarr; <a href="~/Default.cshtml">Início</a></p>
         </form>
     </main>
 </body>

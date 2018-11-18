@@ -45,23 +45,19 @@
                         // Abrir a base de dados
                         var db = Database.Open("arte_e_artes");
 
-                        // Especificar a consulta para seleção do utilizador
+                        // Especificar a consulta para obter dados do utilizador
                         string query = "SELECT Username FROM Utilizadores WHERE ID = @0";
 
                         // Executar a consulta
-                        var Utilizador = db.Query(query, ID);
+                        var Dados = db.QueryValue(query, ID);
 
                         // Erro: redirecionar para a página inicial
-                        if (!Utilizador.Any())
+                        if (DBNull.Value.Equals(Dados))
                         {
                             Response.Redirect("~/admin/Default.cshtml?operacao=editarutilizador_erro", true);
                         }
 
-                        // Obter o username do utilizador
-                        foreach (var U in Utilizador)
-                        {
-                            Username = U.Username;
-                        }
+                        Username = Dados.ToString();
                     }
 
                     // Erro: redirecionar para a página inicial

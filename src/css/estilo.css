@@ -51,6 +51,7 @@ footer .attribution { margin-top: 0.5rem; background-color: #f0efef; padding: 0.
 .destaques .autor { font-size:  0.8rem; }
 .destaques .data { color: #666; }
 .destaques .preco { font-size: 1.2rem; }
+.destaques .erro-produtos { margin: 10vh 0; font-size: 3rem; color: #a6a6a6; text-transform: uppercase; text-align: center; }
 
 /* Página de detalhe de produto */
 .breadcrumbs { margin-bottom: 1.5em; font-size: 0.8rem; }

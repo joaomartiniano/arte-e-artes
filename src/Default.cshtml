@@ -66,21 +66,33 @@
 			</h1>
 
 			<div class="destaques">
-                @foreach (var P in Produtos)
-                {
-                    <text>
-				    <div>
-					    <a href="~/Produto.cshtml?p=@P.ID"><img src="~/assets/@P.Imagem_thumbnail" alt="@P.Designacao" /></a>
-					    <div class="info">
-						    <div class="designacao_preco">
-							    <div class="designacao"><a href="~/Produto.cshtml?p=@P.ID">@P.Designacao</a></div>
-							    <div class="data">@P.Data</div>
-						    </div>
-						    <div class="autor">@P.Autor</div>
-						    <div class="preco">@P.Preco.ToString("C")</div>
-					    </div>
-				    </div>
-                    </text>
+                @{
+                    // Verificar se foram devolvidos resultados
+                    if (!Produtos.Any())
+                    {
+                        <text>
+                        <p class="erro-produtos">Sem produtos para mostrar</p>
+                        </text>
+                    }
+                    else
+                    {
+                        foreach (var P in Produtos)
+                        {
+                            <text>
+                            <div>
+                                <a href="~/Produto.cshtml?p=@P.ID"><img src="~/assets/@P.Imagem_thumbnail" alt="@P.Designacao" /></a>
+                                <div class="info">
+                                    <div class="designacao_preco">
+                                        <div class="designacao"><a href="~/Produto.cshtml?p=@P.ID">@P.Designacao</a></div>
+                                        <div class="data">@P.Data</div>
+                                    </div>
+                                    <div class="autor">@P.Autor</div>
+                                    <div class="preco">@P.Preco.ToString("C")</div>
+                                </div>
+                            </div>
+                            </text>
+                        }
+                    }
                 }
 			</div>
 		</div>

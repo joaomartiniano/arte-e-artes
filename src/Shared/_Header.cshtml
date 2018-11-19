@@ -1,6 +1,6 @@
 ﻿<header>
 	@{
-		if (!(PageData.Any()) || (PageData[0] != "login"))
+		if (!(PageData.Any()) || ((PageData[0] != "login") && (PageData[0] != "erro")))
 		{
 			<text>
 			<div class="botao-login">

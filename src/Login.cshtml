@@ -1,4 +1,9 @@
-﻿@{
+﻿@using WebMatrix.Data;
+@{
+    // Declarar variáveis que irão permitir o acesso à base de dados
+    Database db = null;
+    dynamic Password = null;
+    
     string MensagemErro = "";
 
     // Verificar que são recebidos dados através do método POST
@@ -7,17 +12,37 @@
         // Verificar que os campos obrigatórios estão preenchidos
         if ((!Request.Form["Username"].IsEmpty()) && (!Request.Form["Password"].IsEmpty()))
         {
-            // Abrir a base de dados
-            var db = Database.Open("arte_e_artes");
+            try
+            {
+                // Abrir a base de dados
+                db = Database.Open("arte_e_artes");
+            }
+            catch
+            {
+                // Ocorreu um erro ao abrir a base de dados: redirecionar o utilizador para a página de erro
+                Response.Redirect("~/Erro.cshtml", true);
+            }
 
             // Especificar a consulta para obter dados do utilizador  
             string query = "SELECT Password FROM Utilizadores WHERE Username = @0";
 
-            // Executar a consulta
-            var Password = db.QueryValue(query, Request.Form["Username"]);
-            
+            // Verificar que existe ligação à base de dados
+            if (db != null)
+            {
+                try
+                {
+                    // Executar a consulta: o resultado é colocado na variável Password
+                    Password = db.QueryValue(query, Request.Form["Username"]);
+                }
+                catch (System.Data.SqlServerCe.SqlCeException e)
+                {
+                    // Ocorreu um erro relacionado com a base de dados: redirecionar o utilizador para a página de erro
+                    Response.Redirect("~/Erro.cshtml", true);
+                }
+            }
+
             // Verificar se a consulta devolveu um valor
-            if (!DBNull.Value.Equals(Password))
+            if (Password != null)
             {
                 // Codifica a password introduzida no formulário
                 string hash = Crypto.Hash(Request.Form["password"]);

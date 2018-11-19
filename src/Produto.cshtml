@@ -1,4 +1,9 @@
-﻿@{
+﻿@using WebMatrix.Data;
+@{
+    // Declarar variáveis que irão permitir o acesso à base de dados
+    Database db = null;
+    dynamic Produto = null;
+
     // O ID do produto visualizado na página
     int ID = 0;
 
@@ -13,14 +18,34 @@
         }
     }
 
-    // Abrir a base de dados
-    var db = Database.Open("arte_e_artes");
+    try
+    {
+        // Abrir a base de dados
+        db = Database.Open("arte_e_artes");
+    }
+    catch
+    {
+        // Ocorreu um erro ao abrir a base de dados: redirecionar o utilizador para a página de erro
+        Response.Redirect("~/Erro.cshtml", true);
+    }
   
     // Especificar a consulta para seleção de todos os produtos  
     string query = "SELECT * FROM Produtos WHERE ID = @0";
 
-    // Executar a consulta
-    var Produto = db.QuerySingle(query, ID);
+    // Verificar que existe ligação à base de dados
+    if (db != null)
+    {
+        try
+        {
+            // Executar a consulta: o resultado é colocado na variável Produto
+            Produto = db.QuerySingle(query, ID);
+        }
+        catch (System.Data.SqlServerCe.SqlCeException e)
+        {
+             // Ocorreu um erro ao executar a consulta: atribuir à variável Produto um valor nulo 
+            Produto = null;
+        }
+    }
 }
 <!DOCTYPE html>
 <html lang="pt">
@@ -40,7 +65,7 @@
 
             @{
                 // Verificar se não foram retornados dados
-                if (DBNull.Value.Equals(Produto))
+                if (Produto == null)
                 {
                     <text>
                     <p class="erro-produto">Produto não encontrado</p>

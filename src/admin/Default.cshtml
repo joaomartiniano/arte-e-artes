@@ -1,12 +1,26 @@
-﻿@{
+﻿@using WebMatrix.Data;
+@{
 	// Verificar se o utilizador efetuou login
 	if (Session["Username"] == null)
 	{
 		Response.Redirect("~/Default.cshtml", true);
 	}
 
-    // Abrir a base de dados
-    var db = Database.Open("arte_e_artes");
+    // Declarar variáveis que irão permitir o acesso à base de dados
+    Database db = null;
+    System.Collections.Generic.IEnumerable<dynamic> Produtos = null;
+	System.Collections.Generic.IEnumerable<dynamic> Utilizadores = null;
+
+    try
+    {
+        // Abrir a base de dados
+        db = Database.Open("arte_e_artes");
+    }
+    catch
+    {
+        // Ocorreu um erro ao abrir a base de dados: redirecionar o utilizador para a página de erro
+        Response.Redirect("~/Erro.cshtml", true);
+    }
 
     // Especificar a consulta para seleção de todos os produtos
     string query_produtos = "SELECT * FROM Produtos";
@@ -14,9 +28,35 @@
     // Especificar a consulta para seleção de todos os utilizadores
     string query_utilizadores = "SELECT * FROM Utilizadores";
 
-    // Executar as consultas
-    var Produtos = db.Query(query_produtos);
-	var Utilizadores = db.Query(query_utilizadores);
+	// Verificar que existe ligação à base de dados
+    if (db != null)
+    {
+        try
+        {
+            // Executar a consulta para obter os produtos: o resultado é colocado na variável Produtos
+            Produtos = db.Query(query_produtos);
+        }
+        catch (System.Data.SqlServerCe.SqlCeException e)
+        {
+             // Ocorreu um erro ao executar a consulta: atribuir à variável Produtos um valor nulo 
+            Produtos = null;
+        }
+    }
+
+	// Verificar que existe ligação à base de dados
+    if (db != null)
+    {
+        try
+        {
+            // Executar a consulta para obter os utilizadores: o resultado é colocado na variável Utilizadores
+            Utilizadores = db.Query(query_utilizadores);
+        }
+        catch (System.Data.SqlServerCe.SqlCeException e)
+        {
+             // Ocorreu um erro ao executar a consulta: atribuir à variável Utilizadores um valor nulo 
+            Utilizadores = null;
+        }
+    }
 }
 <!DOCTYPE html>
 <html lang="pt">
@@ -114,10 +154,10 @@
 				<section>
 					<h2>Produtos</h2>
 
-					# Produtos: @Produtos.Count()
+					# Produtos: @{ if (Produtos != null) { <text>@Produtos.Count()</text> } else { <text>0</text> } }
 
 					@{ 
-						if (!Produtos.Any())
+						if ((Produtos == null) || (!Produtos.Any()))
 						{
 							<p class="h2 text-muted text-center">SEM PRODUTOS PARA MOSTRAR</p>
 						}
@@ -151,10 +191,10 @@
 				<section>
 					<h2>Utilizadores</h2>
 
-					# Utilizadores: @Utilizadores.Count()
+					# Utilizadores: @{ if (Utilizadores != null) { <text>@Utilizadores.Count()</text> } else { <text>0</text> } }
 
 					@{ 
-						if (!Utilizadores.Any())
+						if ((Utilizadores == null) || (!Utilizadores.Any()))
 						{
 							<p class="h2 text-muted text-center">SEM UTILIZADORES PARA MOSTRAR</p>
 						}

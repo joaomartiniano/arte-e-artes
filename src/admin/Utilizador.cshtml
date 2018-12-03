@@ -10,6 +10,10 @@
     string Username = "";
     string MensagemErro = "";
 
+    // Declarar variáveis que irão permitir o acesso à base de dados
+    Database db = null;
+    dynamic Dados = null;
+
 	if (!IsPost)
 	{
         // Verificar que o parâmetro 'operacao' é válido
@@ -31,7 +35,7 @@
                     // Verificar que o parâmetro 'id' é válido
                     if ((!Request.QueryString["id"].IsEmpty()) && (Request.QueryString["id"].IsInt()))
                     {
-                        // Armazenar o ID do produto
+                        // Armazenar o ID do utilizador
                         ID = Request.QueryString["id"].AsInt();
 
                         // Armazenar a operação numa variável de sessão
@@ -40,24 +44,43 @@
                         // Armazenar o ID numa variável de sessão
                         Session["ID"] = ID;
 
-                        // Obter os dados do utilizador
-                        
-                        // Abrir a base de dados
-                        var db = Database.Open("arte_e_artes");
+                        try
+                        {
+                            // Abrir a base de dados
+                            db = Database.Open("arte_e_artes");
+                        }
+                        catch
+                        {
+                            // Ocorreu um erro ao abrir a base de dados: redirecionar o utilizador para a página de erro
+                            Response.Redirect("~/Erro.cshtml", true);
+                        }
 
                         // Especificar a consulta para obter dados do utilizador
                         string query = "SELECT Username FROM Utilizadores WHERE ID = @0";
 
-                        // Executar a consulta
-                        var Dados = db.QueryValue(query, ID);
-
-                        // Erro: redirecionar para a página inicial
-                        if (DBNull.Value.Equals(Dados))
+                        // Verificar que existe ligação à base de dados
+                        if (db != null)
                         {
+                            try
+                            {
+                                // Executar a consulta: o resultado é colocado na variável Dados
+                                Dados = db.QuerySingle(query, ID);
+                            }
+                            catch (System.Data.SqlServerCe.SqlCeException e)
+                            {
+                                // Ocorreu um erro ao executar a consulta: atribuir à variável Dados um valor nulo 
+                                Dados = null;
+                            }
+                        }
+
+                        // Verificar se não foram retornados dados
+                        if (Dados == null)
+                        {
+                            // Erro: redirecionar para a página inicial
                             Response.Redirect("~/admin/Default.cshtml?operacao=editarutilizador_erro", true);
                         }
 
-                        Username = Dados.ToString();
+                        Username = Dados.Username;
                     }
 
                     // Erro: redirecionar para a página inicial
@@ -105,44 +128,78 @@
             {
                 string hash = Crypto.Hash(Request.Form["Password"]);
 
-                // Abrir a base de dados
-                var db = Database.Open("arte_e_artes");
+                try
+                {
+                    // Abrir a base de dados
+                    db = Database.Open("arte_e_artes");
+                }
+                catch
+                {
+                    // Ocorreu um erro ao abrir a base de dados: redirecionar o utilizador para a página de erro
+                    Response.Redirect("~/Erro.cshtml", true);
+                }
 
                 // Especificar a consulta consoante a operação a efetuar
                 string query = "";
 
-                if (Operacao == 1)
+                if (Operacao == 1) // Criar um utilizador
                 {
                     query = "INSERT INTO Utilizadores (Username, Password) VALUES (@0, @1)";
-                    
-                    if (db.Execute(query, Request.Form["Username"], hash) == 1)
-                    {
-                        // Remover as variáveis de sessão
-                        Session["Operacao"] = null;
-                        Session["ID"] = null;
 
-                        Response.Redirect("~/admin/Default.cshtml?operacao=criarutilizador_ok", true);
-                    }
-                    else
+                    // Verificar que existe ligação à base de dados
+                    if (db != null)
                     {
-                        MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar criar o novo utilizador</strong></div>";
+                        try
+                        {
+                            // Executar a query e verificar se foi afetado um registo
+                            if (db.Execute(query, Request.Form["Username"], hash) == 1)
+                            {
+                                // Remover as variáveis de sessão
+                                Session["Operacao"] = null;
+                                Session["ID"] = null;
+
+                                Response.Redirect("~/admin/Default.cshtml?operacao=criarutilizador_ok", true);
+                            }
+                            else
+                            {
+                                MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar criar o novo utilizador</strong></div>";
+                            }
+                        }
+                        catch (System.Data.SqlServerCe.SqlCeException e)
+                        {
+                            // Ocorreu um erro ao tentar criar o novo utilizador
+                            MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar criar o novo utilizador</strong></div>";
+                        }
                     }
                 }
-                else if (Operacao == 2)
+                else if (Operacao == 2) // Editar um utilizador
                 {
                     query = "UPDATE Utilizadores SET Username = @0, Password = @1 WHERE ID = @2";
 
-                    if (db.Execute(query, Request.Form["Username"], hash, ID) == 1)
+                    // Verificar que existe ligação à base de dados
+                    if (db != null)
                     {
-                        // Remover as variáveis de sessão
-                        Session["Operacao"] = null;
-                        Session["ID"] = null;
+                        try
+                        {
+                            // Executar a query e verificar se foi afetado um registo
+                            if (db.Execute(query, Request.Form["Username"], hash, ID) == 1)
+                            {
+                                // Remover as variáveis de sessão
+                                Session["Operacao"] = null;
+                                Session["ID"] = null;
 
-                        Response.Redirect("~/admin/Default.cshtml?operacao=editarutilizador_ok", true);
-                    }
-                    else
-                    {
-                        MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar editar o utilizador</strong></div>";
+                                Response.Redirect("~/admin/Default.cshtml?operacao=editarutilizador_ok", true);
+                            }
+                            else
+                            {
+                                MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar editar o utilizador</strong></div>";
+                            }
+                        }
+                        catch (System.Data.SqlServerCe.SqlCeException e)
+                        {
+                            // Ocorreu um erro ao tentar editar o utilizador
+                            MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar editar o utilizador</strong></div>";
+                        }
                     }
                 }
             }

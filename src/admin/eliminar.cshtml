@@ -73,18 +73,7 @@
                             Response.Redirect("~/admin/Default.cshtml?operacao=eliminarutilizador_erro", true);
                         }
                     }
-
-
-
-                    // *** novo código
-                    // se não for possível elminar o utilizador:
-                    // Response.Redirect("~/admin/Default.cshtml?operacao=eliminarutilizador_erro", true);
-
-                    // Executar a query e verificar se foi afetado um registo
-                    /*if (db.Execute(query, Request.QueryString["ID"]) == 1)
-                    {
-                        Response.Redirect("~/admin/Default.cshtml?operacao=eliminarutilizador_ok", true);
-                    }*/
+                    
                     break;
             }
         }

@@ -13,6 +13,10 @@
     string Erro_Designacao = "";
     string Erro_Preco = "";
 
+    // Declarar variáveis que irão permitir o acesso à base de dados
+    Database db = null;
+    dynamic Produto = null;
+
 	if (!IsPost)
 	{
         // Verificar que o parâmetro 'operacao' é válido
@@ -43,19 +47,39 @@
                         // Armazenar o ID numa variável de sessão
                         Session["ID"] = ID;
 
-                        // Obter os dados do produto
-                        // Abrir a base de dados
-                        var db = Database.Open("arte_e_artes");
+                        try
+                        {
+                            // Abrir a base de dados
+                            db = Database.Open("arte_e_artes");
+                        }
+                        catch
+                        {
+                            // Ocorreu um erro ao abrir a base de dados: redirecionar o utilizador para a página de erro
+                            Response.Redirect("~/Erro.cshtml", true);
+                        }
 
                         // Especificar a consulta para seleção dos dados do produto
                         string query = "SELECT * FROM Produtos WHERE ID = @0";
 
-                        // Executar a consulta
-                        var Produto = db.QuerySingle(query, ID);
-
-                        // Erro: redirecionar para a página inicial
-                        if (DBNull.Value.Equals(Produto))
+                        // Verificar que existe ligação à base de dados
+                        if (db != null)
                         {
+                            try
+                            {
+                                // Executar a consulta: o resultado é colocado na variável Dados
+                                Produto = db.QuerySingle(query, ID);
+                            }
+                            catch (System.Data.SqlServerCe.SqlCeException e)
+                            {
+                                // Ocorreu um erro ao executar a consulta: atribuir à variável Dados um valor nulo 
+                                Produto = null;
+                            }
+                        }
+
+                        // Verificar se não foram retornados dados
+                        if (Produto == null)
+                        {
+                            // Erro: redirecionar para a página inicial
                             Response.Redirect("~/admin/Default.cshtml?operacao=editarproduto_erro", true);
                         }
 
@@ -119,44 +143,76 @@
         // Se não ocorreram erros de validação, inserir/atualizar o produto
         if (Validacao)
         {
-            // Abrir a base de dados
-            var db = Database.Open("arte_e_artes");
+            try
+            {
+                // Abrir a base de dados
+                db = Database.Open("arte_e_artes");
+            }
+            catch
+            {
+                // Ocorreu um erro ao abrir a base de dados: redirecionar o utilizador para a página de erro
+                Response.Redirect("~/Erro.cshtml", true);
+            }
 
             // Especificar a consulta consoante a operação a efetuar
             string query = "";
 
-            if (Operacao == 1)
+            if (Operacao == 1) // Criar um produto
             {
                 query = "INSERT INTO Produtos (Designacao, Autor, Descricao, Data, Preco, Imagem_thumbnail, Imagem, Dimensoes, Categoria_ID) VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8)";
-                
-                if (db.Execute(query, DadosProduto.Designacao, DadosProduto.Autor, DadosProduto.Descricao, DadosProduto.Data, DadosProduto.Preco, DadosProduto.Imagem_thumbnail, DadosProduto.Imagem, DadosProduto.Dimensoes, DadosProduto.Categoria_ID) == 1)
-                {
-                    // Remover as variáveis de sessão
-                    Session["Operacao"] = null;
-                    Session["ID"] = null;
 
-                    Response.Redirect("~/admin/Default.cshtml?operacao=criarproduto_ok", true);
-                }
-                else
+                // Verificar que existe ligação à base de dados
+                if (db != null)
                 {
-                    MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar criar o novo produto</strong></div>";
+                    try
+                    {
+                        if (db.Execute(query, DadosProduto.Designacao, DadosProduto.Autor, DadosProduto.Descricao, DadosProduto.Data, DadosProduto.Preco, DadosProduto.Imagem_thumbnail, DadosProduto.Imagem, DadosProduto.Dimensoes, DadosProduto.Categoria_ID) == 1)
+                        {
+                            // Remover as variáveis de sessão
+                            Session["Operacao"] = null;
+                            Session["ID"] = null;
+
+                            Response.Redirect("~/admin/Default.cshtml?operacao=criarproduto_ok", true);
+                        }
+                        else
+                        {
+                            MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar criar o novo produto</strong></div>";
+                        }
+                    }
+                    catch (System.Data.SqlServerCe.SqlCeException e)
+                    {
+                        // Ocorreu um erro ao tentar criar o novo produto
+                        MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar criar o novo produto</strong></div>";
+                    }
                 }
             }
-            else if (Operacao == 2)
+            else if (Operacao == 2) // Editar um produto
             {
                 query = "UPDATE Produtos SET Designacao = @0, Autor = @1, Descricao = @2, Data = @3, Preco = @4, Imagem_thumbnail = @5, Imagem = @6, Dimensoes = @7, Categoria_ID = @8 WHERE ID = @9";
 
-                if (db.Execute(query, DadosProduto.Designacao, DadosProduto.Autor, DadosProduto.Descricao, DadosProduto.Data, DadosProduto.Preco, DadosProduto.Imagem_thumbnail, DadosProduto.Imagem, DadosProduto.Dimensoes, DadosProduto.Categoria_ID, ID) == 1)
+                // Verificar que existe ligação à base de dados
+                if (db != null)
                 {
-                    // Remover as variáveis de sessão
-                    Session["Operacao"] = null;
-                    Session["ID"] = null;
+                    try
+                    {
+                        if (db.Execute(query, DadosProduto.Designacao, DadosProduto.Autor, DadosProduto.Descricao, DadosProduto.Data, DadosProduto.Preco, DadosProduto.Imagem_thumbnail, DadosProduto.Imagem, DadosProduto.Dimensoes, DadosProduto.Categoria_ID, ID) == 1)
+                        {
+                            // Remover as variáveis de sessão
+                            Session["Operacao"] = null;
+                            Session["ID"] = null;
 
-                    Response.Redirect("~/admin/Default.cshtml?operacao=editarproduto_ok", true);
-                }
-                else
-                {
-                    MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar editar o produto</strong></div>";
+                            Response.Redirect("~/admin/Default.cshtml?operacao=editarproduto_ok", true);
+                        }
+                        else
+                        {
+                            MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar editar o produto</strong></div>";
+                        }
+                    }
+                    catch (System.Data.SqlServerCe.SqlCeException e)
+                    {
+                        // Ocorreu um erro ao tentar editar o produto
+                        MensagemErro = "<div class=\"alert alert-danger\" role=\"alert\"><strong>Ocorreu um erro ao tentar editar o produto</strong></div>";
+                    }
                 }
             }
         }
